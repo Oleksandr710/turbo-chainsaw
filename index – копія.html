@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Доступ до камери</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #f9f9f9, #e0e0e0);
+      margin: 0;
+    }
+
+    video {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      background: black;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transform: scaleX(1); /* дзеркальний ефект для фронтальної буде далі */
+      transition: transform 0.3s ease;
+    }
+
+    .btn, .icon-btn {
+      background-color: white;
+      border: none;
+      border-radius: 50%;
+      padding: 15px;
+      margin: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn:hover, .icon-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .btn:active, .icon-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn {
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+
+    .icon-btn img {
+      width: 32px;
+      height: 32px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h2>Доступ до камери</h2>
+  <video id="video" autoplay playsinline></video>
+
+  <button class="btn" onclick="startCamera()">Увімкнути камеру</button>
+  <button class="icon-btn" onclick="switchCamera()">
+    <img src="camera-icon.png" alt="Перемкнути камеру">
+  </button>
+
+  <script>
+    let currentStream;
+    let usingFrontCamera = false;
+    const videoElement = document.getElementById('video');
+
+    async function startCamera() {
+      if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+      }
+
+      const constraints = {
+        video: {
+          facingMode: usingFrontCamera ? "user" : "environment"
+        },
+        audio: false
+      };
+
+      try {
+        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+        videoElement.srcObject = currentStream;
+
+        // Застосовуємо дзеркальний ефект для фронтальної
+        if (usingFrontCamera) {
+          videoElement.style.transform = "scaleX(-1)";
+        } else {
+          videoElement.style.transform = "scaleX(1)";
+        }
+
+      } catch (err) {
+        alert("Помилка доступу до камери: " + err.message);
+      }
+    }
+
+    function switchCamera() {
+      usingFrontCamera = !usingFrontCamera;
+      startCamera();
+    }
+  </script>
+</body>
+</html>

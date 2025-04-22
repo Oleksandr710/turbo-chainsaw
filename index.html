@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Доступ до камери</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
   <style>
     body {
       display: flex;
@@ -24,7 +23,7 @@
       margin-bottom: 20px;
       background: black;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      transform: scaleX(1);
+      transform: scaleX(1); /* дзеркальний ефект для фронтальної буде далі */
       transition: transform 0.3s ease;
     }
 
@@ -64,16 +63,6 @@
       margin-bottom: 10px;
       color: #333;
     }
-
-    #textOutput {
-      max-width: 90%;
-      background: white;
-      padding: 10px;
-      border-radius: 12px;
-      margin-top: 20px;
-      white-space: pre-wrap;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
   </style>
 </head>
 <body>
@@ -84,10 +73,6 @@
   <button class="icon-btn" onclick="switchCamera()">
     <img src="camera-icon.png" alt="Перемкнути камеру">
   </button>
-  <button class="btn" onclick="capture()">📸 Сканувати</button>
-
-  <canvas id="canvas" style="display:none;"></canvas>
-  <div id="textOutput">Очікую сканування...</div>
 
   <script>
     let currentStream;
@@ -110,11 +95,13 @@
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         videoElement.srcObject = currentStream;
 
+        // Застосовуємо дзеркальний ефект для фронтальної
         if (usingFrontCamera) {
           videoElement.style.transform = "scaleX(-1)";
         } else {
           videoElement.style.transform = "scaleX(1)";
         }
+
       } catch (err) {
         alert("Помилка доступу до камери: " + err.message);
       }
@@ -123,24 +110,6 @@
     function switchCamera() {
       usingFrontCamera = !usingFrontCamera;
       startCamera();
-    }
-
-    function capture() {
-      const canvas = document.getElementById('canvas');
-      const context = canvas.getContext('2d');
-      const textOutput = document.getElementById('textOutput');
-
-      canvas.width = videoElement.videoWidth;
-      canvas.height = videoElement.videoHeight;
-      context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
-      Tesseract.recognize(canvas, 'eng', {
-        logger: m => console.log(m)
-      }).then(({ data: { text } }) => {
-        textOutput.textContent = text.trim();
-      }).catch(err => {
-        textOutput.textContent = "Помилка розпізнавання: " + err.message;
-      });
     }
   </script>
 </body>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Камера</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 50px;
+    }
+    video {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Доступ до камери</h1>
+  <button id="startCamera">Увімкнути камеру</button>
+  <video id="video" autoplay playsinline></video>
+
+  <script>
+    const button = document.getElementById('startCamera');
+    const video = document.getElementById('video');
+
+    button.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (err) {
+        alert('Не вдалося отримати доступ до камери: ' + err);
+      }
+    });
+  </script>
+
+</body>
+</html>
